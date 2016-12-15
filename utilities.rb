@@ -1,30 +1,30 @@
 
-def evaluate(x)
-	if x % 100 == 0
-		if x % 400 == 0
-			true
-		else
-			false
-		end
-	elsif x % 4 == 0
-		true
-	else
-		false
-	end
+def leap_year?(year)
+	multiple?(year, 100) ? multiple?(year, 400) : multiple?(year, 4)
 end
 
-def amount(a)
-	('%.1f' % ((a / 31536000.0) * 100)) + '%'
+def multiple?(year, divisor)
+	year % divisor == 0
 end
 
-def convert(x)
-	a, b = x.split(":")
+SECONDS_IN_A_YEAR = 1.0 * 60 * 60 * 24 * 365 # 31536000.0
+
+def seconds_in_year(seconds)
+	format_as_percentage((seconds / SECONDS_IN_A_YEAR) * 100)
+end
+
+def format_as_percentage(n)
+	'%.1f' % n + '%'
+end
+
+def standard_to_military(standard)
+	a, b = standard.split(":")
 	c, d = b.split(" ")
-	e = ""
+	e = nil
 
 	if d.downcase != 'am'
 		if a.to_i == 12
-			e = a + ":" + c
+			add_two(a, c, e)
 		else
 			e = (a.to_i + 12).to_s + ":" + c
 		end
@@ -32,34 +32,43 @@ def convert(x)
 		if a.to_i == 12
 			e = (a.to_i - 12).to_s + ":" + c
 		else
-			e = a + ":" + c
+			add_two(a, c, e)
 		end
 	end
-
 	return e
 end
 
-def convert2(x)
-	a, b = x.split(":")
+def add_two(x, y ,z)
+	z = x + ":" + y
+end
+
+def am_or_pm(military)
+	a, b = military.split(":")
 	c = ""
 
 	if a.to_i < 12
-		c = a + b + " am"
+		c = add_numbers(a, b) + " am"
 	else
-		c = a + b + " pm"
+		c = add_numbers(a, b) + " pm"
 	end
 
 	return c
 end
 
-def okay(a, b)
-	c = false
-	if (a.split(":")[0].to_i >= 8 && b || a.split(":")[0].to_i >= 10 && !b) && a.split(":")[1].split(" ")[1] == 'pm'
-		c = false
+def add_numbers(a, b)
+	a + b
+end
+
+def in_trouble?(time, parents_home)
+	trouble = false
+	if (time.split(":")[0].to_i >= 8 && parents_home)
+		trouble = false
+	elsif (time.split(":")[0].to_i >= 10 && !parents_home) && (time.split(":")[1].split(" ")[1] == 'pm')
+		trouble = false
 	else
-		c = true
+		trouble = true
 	end
-	return c
+	return trouble
 end
 
 def span(a, b)
@@ -73,5 +82,5 @@ def span(a, b)
 		d = b
 	end
 
-	return ('%.1f' % (amount(c)[0..-2].to_f - amount(d)[0..-2].to_f)).to_s + '%'
+	return ('%.1f' % (seconds_in_year(c)[0..-2].to_f - seconds_in_year(d)[0..-2].to_f)).to_s + '%'
 end
